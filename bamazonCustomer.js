@@ -23,7 +23,7 @@ connection.connect(function(err) {
   // makeTable();
 });
 
-console.log("------------Welcome to Bamazon!------------");
+// console.log("------------Welcome to Bamazon!------------");
 
 function makeTable() {
   console.log("------------Select an item to purchase------------");
@@ -52,7 +52,7 @@ function buyerPrompt() {
     {
         type: "input",
         name: "productID",
-        message: "What id product would like to purchase?"
+        message: "What is the id of the product you would like to purchase?"
     },
     {
     	type:"input",
@@ -60,24 +60,33 @@ function buyerPrompt() {
     	name: "quantity"
     },
 
-    ]).then(function(values) {
-      var inputID = values.productID;
-      var inputQuantity = values.inputQuantity;
-      makePurchase (inputID,inputQuantity);
-    });
-}
-
-function makePurchase(productID, quantityRequested) {
-  connection.query("SELECT * FROM products WHERE id =?" + productID, function(error, response) {
-    if (quantityRequested <= res[0].stock_quantity) {
-      var totalCost = res[0].price * quantityRequested;
-      console.log("Product successfully added to cart. You total cost is" + totalCost);
-    } else {
+    ]).then(function(makePurchase) {
+    connection.query("SELECT * FROM products WHERE id =?" + makePurchase.productID, function(error, response) {
+    if (quantity.makePurchase > res[0].stock_quantity) {
       console.log("Insufficient quantity!")
+    } else {
+      var stockQuant = (res[0].stock_quantity);
+      var productPrice = (res[0].price);
+      completeOrder (makePurchase.productID, makePurchase.quantity, stockQuant, productPrice);
     }
+  });
   });
 };
 
-    	
+var completeOrder = function(id, quantOrdered, stockQuant, price){
+  connection.query("UPDATE products SET? WHERE?",
+  [
+    {stock_quantity: stockquant - quantOrdered},
+    {item_id: id}
+  ]
+);
+
+var totalCost = res[0].price * quantity.makePurchase;
+console.log("You total cost is" + totalCost);
+
+};
+
+       
+    
 
   
