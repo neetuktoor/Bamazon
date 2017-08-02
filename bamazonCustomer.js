@@ -1,6 +1,7 @@
 var mysql = require("mysql");
 var inquirer = require("inquirer");
 var Table = require('cli-table');
+//cli-table not working for me :(
 
 // create the connection information for the sql database
 var connection = mysql.createConnection({
@@ -33,8 +34,9 @@ function makeTable() {
 	  console.log("Error select: " + err);
     
     var table = new Table({
-    	head: ['Item ID', 'Product Name', 'Department Name', 'Price', 'Stock Quantity'],
-    	colWidths: [5, 20, 15, 10, 5]
+    	head: ['Item ID', 'Product Name', 'Department Name', 'Price', 'Stock Quantity']
+    	// colWidths: [5, 20, 15, 10, 5]
+     , colWidths: [5, 20, 15, 10, 5]
     });
 
 	  for (var i = 0; i < res.length; i++) {
@@ -42,7 +44,9 @@ function makeTable() {
       );
  	 	}
  	 console.log(table);
- 	 	buyerPrompt ()
+    // console.log(table.toString());
+
+ 	 	buyerPrompt();
 
  	 });
 };
@@ -84,7 +88,7 @@ var completeOrder = function(id, quantOrdered, stockQuant, price){
 function(error, res) {
   connection.query("SELECT * FROM products WHERE ?", {id:id}, function(error, res) {
     var totalCost = res[0].price * quantOrdered;
-    console.log("You total cost is" + totalCost);
+    console.log("You total cost is $ " + totalCost);
 
   });
 });
