@@ -1,6 +1,6 @@
 var mysql = require("mysql");
 var inquirer = require("inquirer");
-var Table = require("cli-table");
+var Table = require('cli-table');
 
 // create the connection information for the sql database
 var connection = mysql.createConnection({
@@ -20,10 +20,10 @@ connection.connect(function(err) {
   if (err) throw err;
 
   // run the start function after the connection is made to prompt the user
-  // makeTable();
+  makeTable();
 });
 
-// console.log("------------Welcome to Bamazon!------------");
+console.log("------------Welcome to Bamazon!------------");
 
 function makeTable() {
   console.log("------------Select an item to purchase------------");
@@ -33,22 +33,22 @@ function makeTable() {
 	  console.log("Error select: " + err);
     
     var table = new Table({
-    	head: ['Item ID', 'Product Name', 'Department Name', 'Price', 'Stock Quantity']
-    	// colWidths: [5, 20, 15, 10, 5]
+    	head: ['Item ID', 'Product Name', 'Department Name', 'Price', 'Stock Quantity'],
+    	colWidths: [5, 20, 15, 10, 5]
     });
 
 	  for (var i = 0; i < res.length; i++) {
     	table.push([res[i].item_id, res[i].product_name, res[i].department_name, res[i].price, res[i].stock_quantity]
       );
  	 	}
- 	 console.log(table.toString());
+ 	 console.log(table);
  	 	buyerPrompt ()
 
  	 });
 };
 
 function buyerPrompt() {	
-  inquire.prompt([
+  inquirer.prompt([
     {
         type: "input",
         name: "productID",
@@ -61,8 +61,10 @@ function buyerPrompt() {
     },
 
     ]).then(function(makePurchase) {
-    connection.query("SELECT * FROM products WHERE id =?" + makePurchase.productID, function(error, response) {
-    if (quantity.makePurchase > res[0].stock_quantity) {
+    connection.query("SELECT * FROM products WHERE ?", {id:makePurchase.productID}, function(error, res) {
+    // console.log(makePurchase.quantity);
+    console.log(res);
+    if (makePurchase.quantity > res[0].stock_quantity) {
       console.log("Insufficient quantity!")
     } else {
       var stockQuant = (res[0].stock_quantity);
@@ -74,19 +76,20 @@ function buyerPrompt() {
 };
 
 var completeOrder = function(id, quantOrdered, stockQuant, price){
-  connection.query("UPDATE products SET? WHERE?",
+  connection.query("UPDATE products SET ? WHERE ?", 
   [
-    {stock_quantity: stockquant - quantOrdered},
+    {stock_quantity: stockQuant - quantOrdered},
     {item_id: id}
-  ]
-);
+  ],
+function(error, res) {
+  connection.query("SELECT * FROM products WHERE ?", {id:id}, function(error, res) {
+    var totalCost = res[0].price * quantOrdered;
+    console.log("You total cost is" + totalCost);
 
-var totalCost = res[0].price * quantity.makePurchase;
-console.log("You total cost is" + totalCost);
+  });
+});
+}
 
-};
 
-       
-    
 
   
