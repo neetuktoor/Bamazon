@@ -26,31 +26,30 @@ connection.connect(function(err) {
 console.log("------------Welcome to Bamazon!------------");
 
 function makeTable() {
+  console.log("------------Select an item to purchase------------");
+
 	connection.query("SELECT * FROM products", function(err, res) {
-		if (err) {
-	  	console.log("Error select: " + err);
-            return;
-        }
-		console.log("------------Select an item to purchase------------");
-
-
-	  var table = new Table({
+		if (err) throw err; 
+	  console.log("Error select: " + err);
+    
+    var table = new Table({
     	head: ['Item ID', 'Product Name', 'Department Name', 'Price', 'Stock Quantity']
-    	colWidths: [5, 20, 15, 10, 5]
-    	});
+    	// colWidths: [5, 20, 15, 10, 5]
+    });
 
 	  for (var i = 0; i < res.length; i++) {
-    	table.push([res[i].item_id, res[i].product_name, res[i].department_name, res[i].price, res[i].stock_quantity]);
+    	table.push([res[i].item_id, res[i].product_name, res[i].department_name, res[i].price, res[i].stock_quantity]
+      );
  	 	}
  	 console.log(table.toString());
- 	 	userPrompt ()
+ 	 	buyerPrompt ()
 
  	 });
 };
 
-var userPrompt = function () {
-	inquire.prompt([
-	{
+function buyerPrompt() {	
+  inquire.prompt([
+    {
         type: "input",
         name: "productID",
         message: "What id product would like to purchase?"
@@ -59,8 +58,26 @@ var userPrompt = function () {
     	type:"input",
    		message: "How many would you like to purchase?",
     	name: "quantity"
+    },
+
+    ]).then(function(values) {
+      var inputID = values.productID;
+      var inputQuantity = values.inputQuantity;
+      makePurchase (inputID,inputQuantity);
+    });
+}
+
+function makePurchase(productID, quantityRequested) {
+  connection.query("SELECT * FROM products WHERE id =?" + productID, function(error, response) {
+    if (quantityRequested <= res[0].stock_quantity) {
+      var totalCost = res[0].price * quantityRequested;
+      console.log("Product successfully added to cart. You total cost is" + totalCost);
+    } else {
+      console.log("Insufficient quantity!")
     }
-    ])
+  });
+};
+
     	
 
   
